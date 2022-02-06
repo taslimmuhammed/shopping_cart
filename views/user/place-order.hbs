@@ -1,0 +1,48 @@
+<h1> Place Order</h1>
+ <div><br>
+ <form id="checkout-form" action="">
+    <div>
+        <label>Enter address</label><input type="text" name="address" id='address'>
+    </div>
+    <br>
+     <div>
+        <label>pin Code</label><input type="text" name="pincode">
+    </div>
+    <br>
+     <div>
+        <label>Mobile No</label><input type="text" name="phoneno">
+    </div>
+    <input type="text" name='userId' id="" value="{{user._id}}" hidden>
+
+    <div class="place-order">
+        <span>Total Amount<br> <h5>{{total}}</h5></span>
+        <input type="radio" id="COD" name="payment-method" value="COD">
+        <label for="">COD</label><br>
+      <input type="radio" id="online-payment" name="payment-method" value="online-payment">
+       <label for="online-payment">online-payment</label><br>
+        <button class="btn btn-primary mt-3" type="submit">
+              Place Order
+        </button>
+    </div>
+    </form>
+</div>
+
+<script>
+    $("#checkout-form").submit((e)=>{
+    console.log("hello world")
+    e.preventDefault()
+     $.ajax({
+         url:'/place-order',
+        method:'post',
+         //serialize is used to get all the data in the form
+         data:$('#checkout-form').serialize(),
+         success:(response)=>{
+             alert(response)
+             if(response.status){
+                 location.href= '/order-success'
+             }
+
+         }
+     })
+})
+</script>

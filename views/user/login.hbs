@@ -1,0 +1,11 @@
+{{#if loginErr}}
+<p>{{loginErr}}</p>
+{{/if}}
+<form action="/login" method="post">
+    <label>Email Address</label>
+    <input name="email" value="taslimmuhammed67@gmail.com"><br><br>
+    <label>PassWord</label>
+    <input name="password" value="taslim"><br><br>
+    <p>Dont Have an Account <a href="/signup">SignUp</a></p>
+    <button type="submit">Login </button>
+</form>

@@ -1,0 +1,174 @@
+Database
+----------------------------------------------------------
+{ 
+    "_id" : ObjectId("61f8e939beb34ac6a7078efe"), 
+    "user" : ObjectId("61f4ef04c0aaf9a50d36b443"), 
+    "products" : [
+        {
+            "item" : ObjectId("61f6ce5e7f3e09f5a7ce52ba"), 
+            "quantity" : NumberInt(4)
+        }, 
+        {
+            "item" : ObjectId("61f818aa6dc95771268c5dbf"), 
+            "quantity" : NumberInt(1)
+        }
+    ]
+}
+
+-----------------------------------------------------------------------------------------------------
+ON unwind
+
+db.get().collection(Collection.CART_COLLECTION).aggregate([
+                {
+                    $match: { user: objectId(userId) }
+                },
+                {
+                    $unwind:'$products'
+                }
+])
+
+RESULT
+
+[
+  {
+    _id: new ObjectId("61f8e939beb34ac6a7078efe"),
+    user: new ObjectId("61f4ef04c0aaf9a50d36b443"),
+    products: { item: new ObjectId("61f6ce5e7f3e09f5a7ce52ba"), quantity: 4 }
+  },
+  {
+    _id: new ObjectId("61f8e939beb34ac6a7078efe"),
+    user: new ObjectId("61f4ef04c0aaf9a50d36b443"),
+    products: { item: new ObjectId("61f818aa6dc95771268c5dbf"), quantity: 1 }
+  }
+]
+
+--------------------------------------------------------------------------------------------
+Project
+
+db.get().collection(Collection.CART_COLLECTION).aggregate([
+                {
+                    $match: { user: objectId(userId) }
+                },
+                {
+                    $unwind:'$products'
+                },
+                {
+                    //$ symbol is used in case of array
+                    $project:{
+                        item: '$products.item',
+                        quantity:'$products.quantity'
+                    }
+                }
+            ])
+
+RESULTS
+
+[
+  {
+    _id: new ObjectId("61f8e939beb34ac6a7078efe"),
+    item: new ObjectId("61f6ce5e7f3e09f5a7ce52ba"),
+    quantity: 4
+  },
+  {
+    _id: new ObjectId("61f8e939beb34ac6a7078efe"),
+    item: new ObjectId("61f818aa6dc95771268c5dbf"),
+    quantity: 1
+  }
+]
+
+------------------------------------------------------------------------------------------------
+
+$lookup (local)
+//used for finding simalar variables accross two collections and merge them to give an array of combined objects
+$lookup:{
+    from: Collection.CART_COLLECTION,
+    localField:'item',
+    foreignField:'_id',
+    as:'products'
+
+}
+
+//picks the products details from 
+
+PARAMETERS
+
+FROM:- Input the collection name from whic the objects has to be imported
+localField:- Name by witch the comparable variable is known in current collection
+foriegnField:- Name by which its known in Other Database
+as:- imported foriegn field is given this name
+
+RESULTS
+
+[
+  {
+    _id: new ObjectId("61f8e939beb34ac6a7078efe"),
+    item: new ObjectId("61f6ce5e7f3e09f5a7ce52ba"),
+    quantity: 4,
+    products: [ [Object] ]
+  },
+  {
+    _id: new ObjectId("61f8e939beb34ac6a7078efe"),
+    item: new ObjectId("61f818aa6dc95771268c5dbf"),
+    quantity: 1,
+    products: [ [Object] ]
+  }
+]
+
+-------------------------------------------------------------------------------------------------
+ADDING ONE MORE PROJECT TO ABOVE RESULTS
+
+, {
+   $project:{
+              item:1, quantity:1,product:{$arrayElemAt:['$product',0]}  //Note products has been replaced as product in the lookup
+             //giving 1 for elements which has to be displayed
+            }
+      }
+
+RESULTS
+
+[
+  {
+    _id: new ObjectId("61f8e939beb34ac6a7078efe"),        
+    item: new ObjectId("61f6ce5e7f3e09f5a7ce52ba"),       
+    quantity: 5,
+    product: {
+      _id: new ObjectId("61f6ce5e7f3e09f5a7ce52ba"),      
+      Name: 'Iphone X',
+      Category: 'Mobile',
+      Price: '800000',
+      Description: 'Apple'
+    }
+  },
+  {
+    _id: new ObjectId("61f8e939beb34ac6a7078efe"),        
+    item: new ObjectId("61f818aa6dc95771268c5dbf"),       
+    quantity: 1,
+    product: {
+      _id: new ObjectId("61f818aa6dc95771268c5dbf"),      
+      Name: 'Realme X7',
+      Category: 'mobile',
+      Price: '200000',
+      Description: 'Oppo'
+    }
+  }
+]
+------------------------------------------------------------
+
+$lookup using pipeline [NOT LINKED TO ABOVE ONES]
+
+             {
+                    $lookup: {
+                        from: 'product',
+                        let: { prodList: '$products' },
+                        pipeline:
+                            [{
+                                $match: {
+                                    $expr: {
+                                        $in: ['$_id', '$$prodList']
+                                    }
+                                }
+                            }]
+                        ,
+                        as: 'cartItems'
+                    }
+                }
