@@ -4,7 +4,6 @@ var Collection = require('../Config/collections')
 var objectId = require('mongodb').ObjectId
 module.exports={
     addProducts:(product, callback)=>{
-        // console.log(product)
         db.get().collection(Collection.PRODUCT_COLLECTION).insertOne(product).then((data)=>{
         callback(data.insertedId.toString())
         })
@@ -20,7 +19,6 @@ module.exports={
     deleteProducts:(proId)=>{
             return new Promise((resolve,reject)=>{
               db.get().collection(Collection.PRODUCT_COLLECTION).remove({_id:objectId(proId)},{justOne:true}).then((response)=>{
-                // console.log(response)
                 resolve(response)
               })
             })      

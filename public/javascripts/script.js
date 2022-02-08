@@ -1,4 +1,4 @@
-const { response } = require("express")
+
 
 function addToCart(proId){
     $.ajax({
@@ -35,7 +35,7 @@ function changeQauntity(cartId,proId,userId,count,quantity)
            x = parseInt(x)+ count
            if(x==0){
               alert('product removed from the cart')
-              location.reload()
+              location.reload('/cart')
            }
            else{
             $(`#${proId}`).html(x)
