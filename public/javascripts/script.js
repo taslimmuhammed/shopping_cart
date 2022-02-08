@@ -6,7 +6,6 @@ function addToCart(proId){
         method:'get',
         success:(response)=>{
             if(response.status){
-                // console.log(response.status)
                 let count = $('#cart-count').html()
                 count = parseInt(count)+1
                 $('#cart-count').html(count)
@@ -30,7 +29,6 @@ function changeQauntity(cartId,proId,userId,count,quantity)
         },
         method:'post',
         success:(response)=>{ 
-           console.log(response)
            let x = $(`#${proId}`).html()
            x = parseInt(x)+ count
            if(x==0){

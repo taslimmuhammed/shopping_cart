@@ -16,8 +16,6 @@ router.get('/add-product',(req,res)=>{
 })
 
 router.post("/add-product",(req,res)=>{
-  // console.log(req.body)
-  // console.log(req.files.Image)
   productHelpers.addProducts(req.body,(id)=>{
     let image =  req.files.Image
     image.mv('./public/product-images/'+id+'.jpg',(err,done)=>{
@@ -33,7 +31,6 @@ router.get("/delete-product/",(req,res)=>{
     productHelpers.deleteProducts(proId).then((response)=>{
       res.redirect('/admin/')
     })
-    // console.log(proId)
 
 })
 router.get('/edit-product/:id',(async(req,res)=>{

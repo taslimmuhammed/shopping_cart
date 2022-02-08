@@ -280,34 +280,28 @@ module.exports = {
               receipt:''+orderId
           } 
           instance.orders.create(options,(err, order)=>{
-                console.log("New Order",order)
                 resolve(order)
           })
         })
     },
     verifyPayment:(details)=>{
 
-        new Promise(async(resolve,reject)=>{
-           try{
-               console.log(details['payment[razorpay_order_id]'])
+       return new Promise(async(resolve,reject)=>{
+       
             let hmac = crypto.createHmac('sha256', 'OrPYq5bIe95u6RtxSZ5j9F6I')
             hmac.update(details['payment[razorpay_order_id]']+'|'+details['payment[razorpay_payment_id]'])
            hmac = hmac.digest('hex')
             if(hmac==details['payment[razorpay_signature]']){
-                console.log("Payment succesful")
-                resolve()
+                console.log("payment success")
+                resolve(details)
             }else{
-                console.log("Payment failed.....")
+                console.log("payment failed..")
                 reject()
             }
-           }catch(err){
-               console.log(err)
-           }
         })
     },
     changePaymentStatus:(orderId)=>{
         return new Promise((resolve,reject)=>{
-            console.log("hello World")
             db.get().collection(Collection.ORDER_COLLECTION).updateOne(
                 {_id:objectId(orderId)},
                 {

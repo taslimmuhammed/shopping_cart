@@ -14,7 +14,6 @@ const verifyLogin = (req,res,next)=>{
 router.get('/',async function(req, res, next) {
   let user = req.session.user
   let cartCount = 0
-  // console.log(user)
   if(user) cartCount =await userHelpers.getCartCount(req.session.user._id)
   productHelpers.getAllProducts().then((products)=>{
   res.render("user/view-products",{ products, user,cartCount})
@@ -35,7 +34,6 @@ router.get('/signup',(req,res)=>{
 
 router.post('/signup',(req,res)=>{
    userHelpers.doSignup(req.body).then((response)=>{
-    //  console.log(response)
      req.session.loggedIn=true;
      req.session.user=  response
      res.redirect('/')
@@ -44,7 +42,6 @@ router.post('/signup',(req,res)=>{
 
 router.post('/login',(req,res)=>{
   userHelpers.doLogin(req.body).then((response)=>{
-    // console.log(response.status)
     if(response.status==true){
       
       req.session.loggedIn  =true;
@@ -77,10 +74,8 @@ router.get('/add-to-cart/:id',verifyLogin,((req,res)=>{
 }))
 //FUNCTION CALLED BY AJAX WILL NOT HAVE SESSION
 router.post('/change-product-quantitiy',(req,res,next)=>{
-  // console.log(req.body)
   userHelpers.changeProductQuantity(req.body).then(async(e)=>{
      e.total = await userHelpers.getTotalAmount(req.body.userId)
-     console.log(e.total)
     res.json(e)
   })
 })
@@ -115,15 +110,13 @@ router.get('/view-order-products/:id',async(req,res)=>{
   res.render('user/view-order-products',{user:req.session.user,products})
 })
 router.post('/verify-payment',(req,res)=>{
-  console.log(req.body)
-  userHelpers.verifyPayment(req.body).then(()=>{
-    console.log(req.body['order[receipt]'])
-    userHelpers.changePaymentStatus(req.body['order[receipt]']).then(()=>{
-      console.log("payment succeded")
+  userHelpers.verifyPayment(req.body).then((e)=>{
+    
+    console.log(e['order[receipt]'])
+    userHelpers.changePaymentStatus(e['order[receipt]']).then(()=>{
       res.json({status:true})
     })
   }).catch((err)=>{
-    console.log(err)
        res.json({status:false,errMsg:''})
   })
 }

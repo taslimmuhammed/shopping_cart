@@ -29,7 +29,6 @@
 
 <script>
     $("#checkout-form").submit((e)=>{
-    console.log("hello world")
     e.preventDefault()
      $.ajax({
          url:'/place-order',
@@ -37,7 +36,6 @@
          //serialize is used to get all the data in the form
          data:$('#checkout-form').serialize(),
          success:(response)=>{
-            //console.log("hello") 
              alert(response)
              if(response.codSuccess){
                  location.href= '/order-success'
@@ -89,7 +87,6 @@ function verifyPayment(payment,order){
             order
         },
         success:(response)=>{
-            console.log(response.status)
            if(response.status) {
                location.href= '../order-success'
                }
